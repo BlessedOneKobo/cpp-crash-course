@@ -21,6 +21,10 @@ struct SimpleString {
         moveSimpleString(other);
     }
 
+    ~SimpleString() {
+        delete[] buffer;
+    }
+
     SimpleString& operator=(const SimpleString& other) {
         if (this == &other) return *this;
         copySimpleString(other);
