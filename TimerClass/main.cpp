@@ -1,12 +1,22 @@
 #include "TimerClass.h"
 #include <utility>
 
+void delay() {
+	TimerClass tc_delay{ "delay" };
+	for (auto i = 0; i < 100000; i++)
+		;
+}
+
+void longer_delay() {
+	TimerClass tc_longer_delay{ "longer_delay" };
+	for (auto i = 0; i < 100000000; i++)
+		;
+}
+
 int main() {
-	TimerClass tc{ "tc" };
-	TimerClass tc_copy{ tc };
-	TimerClass tc_copy_assign = tc_copy;
-	TimerClass tc_move{ std::move(tc) };
-	TimerClass tc_move_assign = std::move(tc_copy);
-	tc_copy_assign = std::move(tc_copy_assign);
-	// TimerClass tc_error{ "" };
+	delay();
+	longer_delay();
+	delay();
+	delay();
+	delay();
 }

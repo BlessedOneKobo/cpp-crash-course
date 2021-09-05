@@ -3,11 +3,6 @@
 #include <stdexcept>
 #include <sys/time.h>
 
-void delay() {
-	for (auto i = 0; i < 100000; i++)
-		;
-}
-
 struct TimeStamp {
 	time_t tv_sec;
 	suseconds_t tv_usec;
@@ -34,7 +29,6 @@ struct TimerClass {
 		}
 		label = new char[name_len + 1];
 		std::strncpy(label, name, name_len);
-		printf("[%s] constructed\n", label);
 	}
 
 	TimerClass(const TimerClass& other) {
@@ -94,8 +88,6 @@ struct TimerClass {
 	}
 
 	~TimerClass() {
-		delay();
-
 		// object is in a "moved from" state
 		if (timestamp.tv_sec == 0 && timestamp.tv_usec == 0) return;
 
