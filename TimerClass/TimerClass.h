@@ -33,57 +33,27 @@ struct TimerClass {
 
 	TimerClass(const TimerClass& other) {
 		if (this == &other) return;
-		
-		timestamp = other.timestamp;
-		auto other_label_len = strlen(other.label);
-		// 6 is for "_copy" postfix and null character
-		label = new char[other_label_len + 6];
-		std::strncpy(label, other.label, other_label_len);
-		std::strncpy(label + other_label_len, "_copy", 6);
+		copyTimerClass(other);
 		printf("[%s] copy constructed from [%s]\n", label, other.label);
 	}
 
 	TimerClass(TimerClass&& other) {
 		if (this == &other) return;
-
-		timestamp = other.timestamp;
-		auto other_label_len = strlen(other.label);
-		delete[] label;
-		label = new char[other_label_len + 6];
-		std::strncpy(label, other.label, other_label_len);
-		std::strncpy(label + other_label_len, "_move", 6);
-
-		other.timestamp.tv_sec  = 0;
-		other.timestamp.tv_usec = 0;
 		printf("[%s] move constructed from [%s]\n", label, other.label);
-		delete[] other.label;
+		moveTimerClass(other);
 	}
 
 	TimerClass& operator=(const TimerClass& other) {
 		if (this == &other) return *this;
-
-		timestamp = other.timestamp;
-		auto other_label_len = strlen(other.label);
-		label = new char[other_label_len + 6];
-		std::strncpy(label, other.label, other_label_len);
-		std::strncpy(label + other_label_len, "_copy", 6);
+		copyTimerClass(other);
 		printf("[%s] copy assigned from [%s]\n", label, other.label);
 		return *this;
 	}
 
 	TimerClass& operator=(TimerClass&& other) {
 		if (this == &other) return *this;
-		
-		timestamp = other.timestamp;
-		auto other_label_len = strlen(other.label);
-		label = new char[other_label_len + 6];
-		std::strncpy(label, other.label, other_label_len);
-		std::strncpy(label + other_label_len, "_move", 6);
-
-		other.timestamp.tv_sec  = 0;
-		other.timestamp.tv_usec = 0;
 		printf("[%s] move assigned from [%s]\n", label, other.label);
-		delete[] other.label;
+		moveTimerClass(other);
 		return *this;
 	}
 
@@ -105,4 +75,22 @@ struct TimerClass {
 private:
 	TimeStamp timestamp;
 	char* label{ nullptr };
+
+	void copyTimerClass(const TimerClass& other) {
+		timestamp = other.timestamp;
+		auto label_len = strlen(other.label);
+		// 6 is for "_copy" postfix and null character
+		label = new char[label_len + 6];
+		std::strncpy(label, other.label, label_len);
+		std::strncpy(label + label_len, "_copy", 6);
+	}
+
+	void moveTimerClass(TimerClass& other) {
+		timestamp = other.timestamp;
+		label = other.label;
+
+		other.timestamp.tv_sec = 0;
+		other.timestamp.tv_usec = 0;
+		other.label = nullptr;
+	}
 };
