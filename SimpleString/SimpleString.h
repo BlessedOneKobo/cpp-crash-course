@@ -13,12 +13,12 @@ struct SimpleString {
     }
 
     SimpleString(const SimpleString& other) {
-        copySimpleString(other);
+        copy_from(other);
     }
 
     SimpleString(SimpleString&& other) {
         if (this == &other) return;
-        moveSimpleString(other);
+        move_from(other);
     }
 
     ~SimpleString() {
@@ -27,13 +27,54 @@ struct SimpleString {
 
     SimpleString& operator=(const SimpleString& other) {
         if (this == &other) return *this;
-        copySimpleString(other);
+        copy_from(other);
         return *this;
     }
-
     SimpleString& operator=(SimpleString&& other) {
         if (this == &other) return *this;
-        moveSimpleString(other);
+        move_from(other);
+        return *this;
+    }
+    SimpleString& operator+(SimpleString& other) {
+        SimpleString* simple_string = new SimpleString{ max_size + other.max_size };
+        simple_string->length = length + other.length;
+        std::strncpy(simple_string->buffer, buffer, length);
+        std::strncpy(simple_string->buffer + length, other.buffer, other.length);
+        return *simple_string;
+    }
+    SimpleString& operator+=(SimpleString& other) {
+        const char* old_buffer = buffer;
+        
+        max_size += other.max_size;
+        buffer = new char[max_size];
+        std::strncpy(buffer, old_buffer, length);
+        std::strncpy(buffer + length, other.buffer, other.length);
+        length += other.length;
+        delete[] old_buffer;
+        return *this;
+    }
+    SimpleString& operator*(unsigned short n) {
+        SimpleString* new_str = new SimpleString{ max_size * n };
+        new_str->length = length * n;
+        new_str->buffer = new char[new_str->max_size];
+        
+        for (unsigned short i = 0; i < n; i++) {
+            std::strncpy(new_str->buffer + length * i, buffer, length);
+        }
+
+        return *new_str;
+    }
+    SimpleString& operator*=(unsigned short n) {
+        char* old_buffer = buffer;
+        max_size *= n;
+        buffer = new char[max_size];
+
+        for (unsigned short i = 0; i < n; i++) {
+            std::strncpy(buffer + length * i, old_buffer, length);
+        }
+
+        delete[] old_buffer;
+        length *= n;
         return *this;
     }
 
@@ -56,14 +97,14 @@ private:
     size_t length;
     char* buffer;
     
-    void copySimpleString(const SimpleString& other) {
+    void copy_from(const SimpleString& other) {
         buffer = new char[other.max_size];
         std::strncpy(buffer, other.buffer, other.length);
         length = other.length;
         max_size = other.max_size;
     }
 
-    void moveSimpleString(SimpleString& other) {
+    void move_from(SimpleString& other) {
         buffer = other.buffer;
         length = other.length;
         max_size = other.max_size;
